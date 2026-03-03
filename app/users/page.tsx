@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
   // The hook returns an object with the value and two functions
   // Simply choose what you need from the hook:
   const {
-    // value: token, // is commented out because we dont need to know the token value for logout
+    value: token, // read the stored auth token so we can check whether the user is logged in
     // set: setToken, // is commented out because we dont need to set or update the token value
     clear: clearToken, // all we need in this scenario is a method to clear the token
   } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
@@ -49,6 +49,17 @@ const Dashboard: React.FC = () => {
     clearToken();
     router.push("/login");
   };
+
+    // Auth guard: if no token is present, redirect to /login.
+  // We check localStorage directly to avoid redirecting before the hook has loaded.
+  useEffect(() => {
+      if (typeof window !== "undefined" && (!token || token === "")) {
+          const stored = localStorage.getItem("token");
+          if (!stored) {
+              router.push("/login");
+          }
+      }
+  }, [token, router]);
 
   useEffect(() => {
     const fetchUsers = async () => {

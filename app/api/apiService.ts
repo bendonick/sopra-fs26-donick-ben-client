@@ -62,9 +62,16 @@ export class ApiService {
    */
   public async get<T>(endpoint: string): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+    // read token from localStorage and remove any extra quotes
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
     const res = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: {
+        // spread existing default headers (Content-Type etc.)
+        ...this.defaultHeaders,
+        // if token exists, add it to Authorization header, otherwise add nothing
+        ...(token ? { Authorization: token } : {}),
+      },
     });
     return this.processResponse<T>(
       res,
@@ -99,9 +106,16 @@ export class ApiService {
    */
   public async put<T>(endpoint: string, data: unknown): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+    // read token from localStorage and remove any extra quotes
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: {
+        // spread existing default headers (Content-Type etc.)
+        ...this.defaultHeaders,
+        // if token exists, add it to Authorization header, otherwise add nothing
+        ...(token ? { Authorization: token } : {}),
+      },
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
